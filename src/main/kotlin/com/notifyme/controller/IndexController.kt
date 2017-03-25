@@ -1,14 +1,21 @@
 package com.notifyme.controller
 
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.PathVariable
 
-@Controller
-open class IndexController
+@RestController
+open class IndexController {
 
-    @RequestMapping("/")
-    @ResponseBody
-    fun showIndex(): String {
-        return "dare nie?"
+    @GetMapping("/")
+    fun helloWorld() = helloUser("World")
+
+    @GetMapping("/{user}")
+    fun helloUser(@PathVariable("user") user: String) = "Hello $user!"
+
+    @GetMapping("/show/message")
+    fun showMessage(): String {
+        return "notifyMe"
     }
+
+}
