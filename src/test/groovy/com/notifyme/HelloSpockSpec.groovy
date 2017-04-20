@@ -8,7 +8,7 @@ class HelloSpockSpec extends spock.lang.Specification {
         where:
         name    | length
         "Spock" | 5
-        "Kirk"  | 5
+        "Kirk"  | 4
     }
 
     def "collaborators must be invoked in order"()
