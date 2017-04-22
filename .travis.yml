@@ -1,6 +1,12 @@
 language: java
+
 jdk:
   - oraclejdk8
+
+# safelist
+branches:
+  only:
+  - travis_ci
 
 script:
     - ./gradlew build
