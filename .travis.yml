@@ -15,9 +15,9 @@ branches:
 
 script:
   - if [ "$BUILD_DOCKER" == "true" ]; then
-    ./gradlew buildDocker
+    ./gradlew buildDocker;
     else
-    ./gradlew build
+    ./gradlew build;
     fi
 
 after_success:
