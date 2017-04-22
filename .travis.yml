@@ -14,10 +14,14 @@ branches:
   - travis_ci
 
 script:
-    - ./gradlew buildDocker
+  - if [ "$BUILD_DOCKER" == "true" ]; then
+    ./gradlew buildDocker
+    else
+    ./gradlew build
+    fi
 
 after_success:
-  - if [ "$TRAVIS_BRANCH" == "travis_ci" ]; then
+  - if [ "$BUILD_DOCKER" == "true" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
     docker push elkaprojects/notifyme;
     fi
