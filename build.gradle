@@ -39,7 +39,7 @@ dependencies {
 task buildDocker(type: Docker, dependsOn: build) {
     baseImage = 'develar/java:latest'
     push = project.hasProperty('push')
-    tag = 'elka-projects/notifyme'
+    tag = 'elkaprojects/notifyme'
     addFile {
         from jar
         rename {'app.jar'}

@@ -1,4 +1,9 @@
+sudo: required
+
 language: java
+
+services:
+  - docker
 
 jdk:
   - oraclejdk8
@@ -9,4 +14,10 @@ branches:
   - travis_ci
 
 script:
-    - ./gradlew build
+    - ./gradlew buildDocker
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "travis_ci" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push elkaprojects/notifyme;
+    fi
