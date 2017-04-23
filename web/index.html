@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet", href="node_modules/angular-material/angular-material.min.css">
+        <link rel="stylesheet", href="style.css">
+        <meta name="viewport" content="width=device-width">
+        <link href="https://fonts.googleapis.com/css?family=Vibur" rel="stylesheet">
+    </head>
+    <body ng-app="notifyMe" layout="column">
+      <md-toolbar class="md-toolbar-tools" flex>
+        <h1 class="logo">notifyMe</h1>
+      </md-toolbar>
+      <!-- <main ng-view></main> -->
+      <ng-view class="container" layout="row" layout-xs="column" flex></ng-view>
+        <script src="node_modules/angular/angular.min.js"></script>
+        <script src="node_modules/angular-animate/angular-animate.min.js"></script>
+        <script src="node_modules/angular-aria/angular-aria.min.js"></script>
+        <script src="node_modules/angular-material/angular-material.min.js"></script>
+        <script src="node_modules/angular-route/angular-route.min.js"></script>
+        <script src="app/app.js"></script>
+    </body>
+</html>
