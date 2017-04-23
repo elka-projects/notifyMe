@@ -31,6 +31,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile "org.codehaus.groovy:groovy-all:2.4.1"
     testCompile "org.spockframework:spock-core:1.1-groovy-2.4-rc-3"
+    testRuntime "cglib:cglib-nodep:3.2.4"          // allows mocking of classes (in addition to interfaces)
+    testRuntime "org.objenesis:objenesis:2.5.1"    // allows mocking of classes without default constructor
     compile group: 'org.springframework', name: 'spring-webmvc', version: '4.3.7.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.2.RELEASE'
 }
