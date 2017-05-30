@@ -1,6 +1,5 @@
 package com.notifyme;
 
-import com.notifyme.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,7 @@ public class UserService  {
 
         for(User user : users)
         {
-            if(user.firstName.equals(firstName))
+            if(user.getFirstName().equals(firstName))
             {
                 return user;
 
@@ -36,7 +35,7 @@ public class UserService  {
 
         for(User user : users)
         {
-            if(user.lastName.equals(lastName))
+            if(user.getLastName().equals(lastName))
             {
                 answer.add(user);
             }
@@ -50,7 +49,7 @@ public class UserService  {
 
         for(User user : users)
         {
-            for(String project : user.projects)
+            for(String project : user.getProjects())
             {
                 if(project.equals(projects))
                 {
