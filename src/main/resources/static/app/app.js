@@ -9,5 +9,11 @@ notifyMe.config(function($mdThemingProvider, $routeProvider){
            templateUrl: 'app/views/home.html'
         }).otherwise({
            redirectTo: '/home'
-        })
+        });
+});
+
+notifyMe.controller('MyController', function($scope, $mdSidenav) {
+  $scope.openLeftMenu = function() {
+    $mdSidenav('left').toggle();
+  };
 });
