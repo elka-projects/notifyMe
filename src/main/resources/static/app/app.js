@@ -10,6 +10,9 @@ notifyMe.config(function($mdThemingProvider, $routeProvider){
         })
         .when('/login',{
           templateUrl: 'app/views/login.html'
+        })
+        .when('/register', {
+          templateUrl: 'app/views/register.html'
         }).otherwise({
            redirectTo: '/home'
         });
@@ -26,6 +29,22 @@ notifyMe.controller('Ctrl', function($scope){
       formData: {
         email: '',
        	password: ''
+      }
+
+  };
+  $scope.logUser = function() {
+    console.log("logged in", $scope.vm.formData.email);
+  }
+});
+
+notifyMe.controller("RegisterCtrl", function ($scope) {
+  $scope.vm = {
+      formData: {
+        email: '',
+        password: '',
+        lastName: '',
+        firstName: '',
+        login: ''
       }
   };
 });
