@@ -51,9 +51,14 @@
 
 }
 
+.sidenavButton{
+  text-align: left;
+}
+
 #menu-bar li{
   float: right;
   margin-left: 20px;
+
 }
 
 #menu-bar a{

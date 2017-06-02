@@ -10,9 +10,8 @@
       <header ng-include="'app/views/header.html'"></header>
       <div layout="row" flex ng-controller="MyController">
         <md-sidenav flex layout ="column"  md-component-id="left">
-          <md-button class="md-icon-button menu-button">
-             <md-icon md-svg-src="app/assets/svg/menu.svg"></md-icon>
-          </md-button>
+          <div ng-include="'app/views/sidenavContent.html'">
+          </div>
         </md-sidenav>
       <ng-view class="container"  flex></ng-view>
     </div>
