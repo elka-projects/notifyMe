@@ -10,15 +10,15 @@ public class Template {
     private String id;
 
     private String title;
-    private String level;
     private String content;
     private String project;
+    private String date;
+    private String author;
 
     public Template() {};
 
-    public Template(String title, String level, String content) {
+    public Template(String title, String content) {
         this.setTitle(title);
-        this.setLevel(level);
         this.setContent(content);
     }
 
@@ -45,14 +45,6 @@ public class Template {
         this.title = title;
     }
 
-    public String getLevel() {
-        return level;
-    }
-
-    public void setLevel(String level) {
-        this.level = level;
-    }
-
     public String getContent() {
         return content;
     }
@@ -67,5 +59,21 @@ public class Template {
 
     public void setProject(String project) {
         this.project = project;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }
