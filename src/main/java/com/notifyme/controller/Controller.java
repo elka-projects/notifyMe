@@ -23,8 +23,8 @@ public class Controller {
     @Autowired
     private UserRepository userRepository;
 
-    private String resultTrue = "";
-    private String resultFalse = "";
+    private String resultTrue = "{ \"result\" : \"true\" }";
+    private String resultFalse = "{ \"result\" : \"false\" }";
 
     @Autowired
     private TemplateRepository templateRepository;
@@ -232,6 +232,16 @@ public class Controller {
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public String logout(@RequestBody String body) {
-        return "{ \"result\" : \"true\" }"
+        return resultTrue;
+    }
+
+    @RequestMapping(value = "/sendNotification", method = RequestMethod.POST)
+    public String sendMail(@RequestBody String body) {
+        JSONObject mailInfo = new JSONObject(body);
+        String templateId = (String)mailInfo.get("id");
+        Template template = templateRepository.findById(templateId);
+
+
+        return resultTrue;
     }
 }
