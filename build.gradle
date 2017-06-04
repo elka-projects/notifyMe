@@ -33,9 +33,9 @@ dependencies {
     testRuntime "org.objenesis:objenesis:2.5.1"    // allows mocking of classes without default constructor
     compile group: 'org.springframework', name: 'spring-webmvc', version: '4.3.7.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.2.RELEASE'
-    compile('org.springframework.boot:spring-boot-starter-security')
-    compile('io.jsonwebtoken:jjwt:0.7.0')
-    compile ("org.springframework.boot:spring-boot-starter-data-mongodb")
+    compile ('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile 'com.auth0:auth0-spring-security-api:1.0.0-rc.2'
+    compile group: 'org.json', name: 'json', version: '20141113'
 }
 
 task buildDocker(type: Docker, dependsOn: build) {

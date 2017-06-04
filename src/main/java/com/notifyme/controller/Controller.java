@@ -1,16 +1,21 @@
-package com.notifyme;
+package com.notifyme.controller;
 
 /**
  * Created by gepard on 20.04.17.
  */
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.notifyme.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class Controller {
@@ -18,8 +23,14 @@ public class Controller {
     @Autowired
     private UserRepository userRepository;
 
+    private String resultTrue = "";
+    private String resultFalse = "";
+
     @Autowired
     private TemplateRepository templateRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
@@ -29,33 +40,49 @@ public class Controller {
         return "Hello!";
     }
 
-    @RequestMapping("/projects/{proj}")
-    public String getProjectCollaborators(@PathVariable String proj ) {
-        List<User> users = userRepository.findByProjects(proj);
-        String result = new String();
-        for ( User u : users )
-            result = result.concat( u.getId() + " " );
-        return result;
+    @RequestMapping(value = "/projects/{proj}", method = RequestMethod.GET )
+    public String getProjectCollaborators(@RequestBody String body ) {
+        ObjectMapper mapper = new ObjectMapper();
+        Project p;
+        try {
+            p = mapper.readValue(body, Project.class);
+        }
+        catch( Exception e ) {
+            return e.getMessage();
+        }
+
+        List<User> users = userRepository.findByProjects(p.getTitle());
+
+        JSONArray array = new JSONArray();
+
+        for ( User u : users ) {
+            JSONObject o = new JSONObject();
+            o.put("login", u.getLogin());
+            o.put("id", u.getId());
+            array.put(o);
+        }
+        return array.toString();
     }
 
-    @RequestMapping("/save")
-    public String saved() {
-        User user = new User("Janusz", "Nowak");
-        user.addProject("PIK");
-        user.addProject("piec_procent");
-        user.addProject("muszka");
+    @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
+    public String addUserToProject(@RequestBody String body) {
+        JSONObject subscription = new JSONObject(body);
+        String userId = (String)subscription.get("userId");
+        String title = (String)subscription.get("title");
+        User user = userRepository.findById(userId);
+        user.addProject(title);
         userRepository.save(user);
-        user = new User("Janusz", "Kowalski");
-        user.addProject("PIK");
-        user.addProject("piec_procent");
-        user.addProject("muszka");
-        userRepository.save(user);
-        user = new User("Janusz", "Macias");
-        user.addProject("PIK");
-        user.addProject("piec_procent");
-        user.addProject("muszka");
-        userRepository.save(user);
-        return "I did it!";
+        return resultTrue;
+    }
+
+    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST)
+    public String deleteUserFromProject(@RequestBody String body) {
+        JSONObject unsubscribe = new JSONObject(body);
+        String userId = (String)unsubscribe.get("userId");
+        String title = (String)unsubscribe.get("title");
+        User user = userRepository.findById(userId);
+        user.deleteProject(title);
+        return resultTrue;
     }
 
     @RequestMapping("/deleteAll")
@@ -64,21 +91,34 @@ public class Controller {
         return "All data deleted";
     }
 
-    @RequestMapping("/showUserId/{firstName}")
-    public String getUserId(@PathVariable String firstName) {
-        User user = userRepository.findByFirstName(firstName);
-        return user.getId();
-    }
+    @RequestMapping(value = "/getUserProjects", method = RequestMethod.POST)
+    public String getUserProjects(@RequestBody String body ) {
+        ObjectMapper mapper = new ObjectMapper();
+        User u;
+        try {
+            u = mapper.readValue(body, User.class);
+        }
+        catch( Exception e ) {
+            return e.getMessage();
+        }
 
-    @RequestMapping("/getUserProjects/{userId}")
-    public String getUserProjects(@PathVariable String userId ) {
-       User user = userRepository.findById(userId);
-       List<String> projects = user.getProjects();
-       String result = new String();
-       for( String p : projects ) {
-           result = result + " " + p;
-       }
-       return result;
+        User user = userRepository.findByLogin(u.getLogin());
+        List<String> projects = user.getProjects();
+
+        JSONArray array = new JSONArray();
+        for( String p : projects ) {
+            Project project = projectRepository.findByTitle(p);
+            JSONObject j = new JSONObject();
+            j.put("title", project.getTitle());
+            j.put("projectID", project.getProjectId());
+            boolean owned = false;
+            if( project.getAuthor() == user.getId() ) {
+                owned = true;
+            }
+            j.put("owner", owned);
+            array.put(j);
+        }
+        return array.toString();
     }
 
     @RequestMapping("/getTemplatesByProject/{proj}")
@@ -91,41 +131,107 @@ public class Controller {
         return result;
     }
 
-    @RequestMapping("/getTemplateContentByTitle/{proj}/{title}")
-    public String getTemplateContentByTitle(@PathVariable String title, @PathVariable String proj) {
-        Template temp = templateRepository.findByTitleAndProject(title, proj);
-        return temp.getContent();
+    @RequestMapping(value = "/saveProject", method = RequestMethod.POST)
+    public String saveProject(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        Project project;
+        try {
+            project = mapper.readValue(body, Project.class);
+        }
+        catch( Exception e ) {
+            return resultFalse;
+        }
+        projectRepository.save(project);
+        return resultTrue;
     }
 
-    @RequestMapping("/saveUserData/{data}")
-    public String saveUserData(@PathVariable String data) {
+    @RequestMapping(value = "/delProject", method = RequestMethod.POST)
+    public String delProject(@RequestBody String body) {
         ObjectMapper mapper = new ObjectMapper();
-        String test = "{ \"firstName\" : \"Filip\" }";
+        Project project;
+        try {
+            project = mapper.readValue(body, Project.class);
+        }
+        catch( Exception e ) {
+            return resultFalse;
+        }
+        templateRepository.delete(project.getProjectId());
+        return resultTrue;
+    }
+
+    @RequestMapping(value = "/saveTemplate", method = RequestMethod.POST)
+    public String saveTemplate(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        Template template;
+        try {
+            template = mapper.readValue(body, Template.class);
+        }
+        catch( Exception e ) {
+            return resultFalse;
+        }
+        templateRepository.save(template);
+        return resultTrue;
+    }
+
+    @RequestMapping(value = "/deleteTemplate", method = RequestMethod.POST)
+    public String deleteTemplate(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
+        Template template;
+        try {
+            template = mapper.readValue(body, Template.class);
+        }
+        catch( Exception e ) {
+            return resultFalse;
+        }
+        templateRepository.delete(template.getId());
+        return resultTrue;
+    }
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public String register(@RequestBody String body) {
+        ObjectMapper mapper = new ObjectMapper();
         User user;
         try {
-            user = mapper.readValue(data, User.class);
+            user = mapper.readValue(body, User.class);
         }
         catch( Exception e ) {
             return e.getMessage();
         }
         userRepository.save(user);
-        return user.getFirstName();
+        return "{ \"result\" : \"true\" }";
     }
 
-    @RequestMapping("/saveTemplate/{data}")
-    public String saveTemplate(@PathVariable String data) {
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public String authenticate(@RequestBody String body) {
         ObjectMapper mapper = new ObjectMapper();
-        String test = "{ \"firstName\" : \"Filip\" }";
-        Template template;
+        User user;
         try {
-            template = mapper.readValue(data, Template.class);
+            user = mapper.readValue(body, User.class);
         }
         catch( Exception e ) {
-            return e.getMessage();
+            return "{ \"jwt\" : \"0\" }";
         }
-        templateRepository.save(template);
-        return template.getTitle();
+        if( userRepository.findByLoginAndPassword(user.getLogin(), user.getPassword()) == null ) {
+            return "{ \"jwt\" : \"0\" }";
+        }
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC256("my-secret-code");
+            String token = JWT.create()
+                    .withIssuer("test")
+                    .withAudience("test")
+                    .sign(algorithm);
+            return "{ \"jwt\" : \"" + token + "\"  } ";
+        } catch (UnsupportedEncodingException exception){
+            //UTF-8 encoding not supported
+        } catch (JWTCreationException exception){
+            //Invalid Signing configuration / Couldn't convert Claims.
+        }
+        return "{ \"jwt\" : \"0\" }";
     }
 
-
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public String logout(@RequestBody String body) {
+        return "{ \"result\" : \"true\" }"
+    }
 }
