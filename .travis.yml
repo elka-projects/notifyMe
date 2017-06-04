@@ -1,0 +1,27 @@
+sudo: required
+
+language: java
+
+services:
+  - docker
+
+jdk:
+  - oraclejdk8
+
+# safelist
+branches:
+  only:
+  - master
+
+script:
+  - if [ "$BUILD_DOCKER" == "true" ]; then
+    ./gradlew buildDocker;
+    else
+    ./gradlew build;
+    fi
+
+after_success:
+  - if [ "$BUILD_DOCKER" == "true" ]; then
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push pik05/notifyme;
+    fi
