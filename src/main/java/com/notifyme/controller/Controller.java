@@ -4,6 +4,7 @@ package com.notifyme.controller;
  * Created by gepard on 20.04.17.
  */
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -12,10 +13,14 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.notifyme.*;
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.*;
+
+import javax.mail.SendFailedException;
 
 @RestController
 public class Controller {
@@ -30,10 +35,17 @@ public class Controller {
     private TemplateRepository templateRepository;
 
     @Autowired
+    private TemplateSentRepository templateSentRepository;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
+
+    @Autowired
+    private EmailService emailService;
+
 
     @RequestMapping("/greeting")
     public String greet() {
@@ -41,17 +53,8 @@ public class Controller {
     }
 
     @RequestMapping(value = "/projects/{proj}", method = RequestMethod.GET )
-    public String getProjectCollaborators(@RequestBody String body ) {
-        ObjectMapper mapper = new ObjectMapper();
-        Project p;
-        try {
-            p = mapper.readValue(body, Project.class);
-        }
-        catch( Exception e ) {
-            return e.getMessage();
-        }
-
-        List<User> users = userRepository.findByProjects(p.getTitle());
+    public String getProjectCollaborators(@PathVariable String proj ) {
+        List<User> users = userRepository.findByProjects(proj);
 
         JSONArray array = new JSONArray();
 
@@ -112,7 +115,7 @@ public class Controller {
             j.put("title", project.getTitle());
             j.put("projectID", project.getProjectId());
             boolean owned = false;
-            if( project.getAuthor() == user.getId() ) {
+            if( project.getAuthor().equals( user.getId() ) ) {
                 owned = true;
             }
             j.put("owner", owned);
@@ -197,8 +200,11 @@ public class Controller {
         catch( Exception e ) {
             return e.getMessage();
         }
+        if( userRepository.findByLogin(user.getLogin()) != null ) {
+            return resultFalse;
+        }
         userRepository.save(user);
-        return "{ \"result\" : \"true\" }";
+        return resultTrue;
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
@@ -238,10 +244,75 @@ public class Controller {
     @RequestMapping(value = "/sendNotification", method = RequestMethod.POST)
     public String sendMail(@RequestBody String body) {
         JSONObject mailInfo = new JSONObject(body);
-        String templateId = (String)mailInfo.get("id");
+
+        String templateId = (String) mailInfo.get("id");
+        String sendDate = (String) mailInfo.get("date");
+
         Template template = templateRepository.findById(templateId);
 
+        Project project = projectRepository.findByTitle(template.getProject());
+        List<User> receivers = userRepository.findByProjects(template.getProject());
+
+        TemplateSent templateSent = new TemplateSent();
+        ObjectId id = new ObjectId();
+        templateSent.setId(id.toString());
+        templateSent.setTemplateId(templateId);
+        templateSent.setDate(sendDate);
+
+        try {
+            for (User user: receivers) {
+                emailService.sendTemplatedMessage(
+                        user.getMail(),
+                        template);
+
+                if (user.getTemplatesHistory() == null)
+                    user.setTemplatesHistory(new ArrayList<String>());
+                user.getTemplatesHistory().add(id.toString());
+                userRepository.save(user);
+            }
+
+        } catch (MailException e) {
+            return resultFalse;
+        }
+
+        templateSentRepository.save(templateSent);
 
         return resultTrue;
     }
+
+    @RequestMapping(value = "/data/{login}", method = RequestMethod.GET)
+    public String getuserHistory(@PathVariable String login) {
+        User user = userRepository.findByLogin(login);
+        List<String> list = user.getTemplatesHistory();
+        JSONArray array = new JSONArray();
+        for( String l : list ) {
+            TemplateSent ts = templateSentRepository.findById(l);
+            Template t = templateRepository.findById(ts.getTemplateId());
+
+            JSONObject object = new JSONObject();
+            object.put("author", t.getAuthor());
+            object.put("project", t.getProject());
+            object.put("title", t.getTitle());
+            object.put("id", t.getId());
+            object.put("content", t.getContent());
+            object.put("date", ts.getDate());
+            array.put(object);
+        }
+        return array.toString();
+    }
+
+    @RequestMapping(value = "/projectNotifications/{proj}", method = RequestMethod.GET)
+    public String getProjectTemplates(@PathVariable String proj) {
+        List<Template> templates = templateRepository.findByProject(proj);
+        JSONArray array = new JSONArray();
+        for( Template t : templates ) {
+            JSONObject object = new JSONObject();
+            object.put("id", t.getId());
+            object.put("title", t.getTitle());
+
+            array.put(object);
+        }
+        return array.toString();
+    }
+
 }
