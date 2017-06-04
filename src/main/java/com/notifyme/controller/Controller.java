@@ -52,17 +52,8 @@ public class Controller {
     }
 
     @RequestMapping(value = "/projects/{proj}", method = RequestMethod.GET )
-    public String getProjectCollaborators(@RequestBody String body ) {
-        ObjectMapper mapper = new ObjectMapper();
-        Project p;
-        try {
-            p = mapper.readValue(body, Project.class);
-        }
-        catch( Exception e ) {
-            return e.getMessage();
-        }
-
-        List<User> users = userRepository.findByProjects(p.getTitle());
+    public String getProjectCollaborators(@PathVariable String proj ) {
+        List<User> users = userRepository.findByProjects(proj);
 
         JSONArray array = new JSONArray();
 
@@ -123,7 +114,7 @@ public class Controller {
             j.put("title", project.getTitle());
             j.put("projectID", project.getProjectId());
             boolean owned = false;
-            if( project.getAuthor() == user.getId() ) {
+            if( project.getAuthor().equals( user.getId() ) ) {
                 owned = true;
             }
             j.put("owner", owned);
@@ -282,4 +273,40 @@ public class Controller {
 
         return resultTrue;
     }
+
+    @RequestMapping(value = "/data/{login}", method = RequestMethod.GET)
+    public String getuserHistory(@PathVariable String login) {
+        User user = userRepository.findByLogin(login);
+        List<String> list = user.getTemplatesHistory();
+        JSONArray array = new JSONArray();
+        for( String l : list ) {
+            TemplateSent ts = templateSentRepository.findById(l);
+            Template t = templateRepository.findById(ts.getTemplateId());
+
+            JSONObject object = new JSONObject();
+            object.put("author", t.getAuthor());
+            object.put("project", t.getProject());
+            object.put("title", t.getTitle());
+            object.put("id", t.getId());
+            object.put("content", t.getContent());
+            object.put("date", ts.getDate());
+            array.put(object);
+        }
+        return array.toString();
+    }
+
+    @RequestMapping(value = "/projectNotifications/{proj}", method = RequestMethod.GET)
+    public String getProjectTemplates(@PathVariable String proj) {
+        List<Template> templates = templateRepository.findByProject(proj);
+        JSONArray array = new JSONArray();
+        for( Template t : templates ) {
+            JSONObject object = new JSONObject();
+            object.put("id", t.getId());
+            object.put("title", t.getTitle());
+
+            array.put(object);
+        }
+        return array.toString();
+    }
+
 }

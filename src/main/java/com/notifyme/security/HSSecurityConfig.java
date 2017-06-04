@@ -33,8 +33,9 @@ public class HSSecurityConfig extends WebSecurityConfigurerAdapter {
         JwtWebSecurityConfigurer.forHS256("test", "test", secret.getBytes())
                 .configure(http)
                 .authorizeRequests()
-                .antMatchers("/projects/**").fullyAuthenticated()
-                .antMatchers("/showUserId/**").fullyAuthenticated();
+                .antMatchers("/authenticate").anonymous()
+                .antMatchers("/register").anonymous()
+                .antMatchers("/**").fullyAuthenticated();
         //                .antMatchers(HttpMethod.GET, "/secure/**").hasAuthority("read:greeting");
 
     }

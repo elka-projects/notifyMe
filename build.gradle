@@ -36,6 +36,7 @@ dependencies {
     compile ('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile 'com.auth0:auth0-spring-security-api:1.0.0-rc.2'
     compile group: 'org.json', name: 'json', version: '20141113'
+    compile("org.springframework.boot:spring-boot-starter-mail")
 }
 
 task buildDocker(type: Docker, dependsOn: build) {
