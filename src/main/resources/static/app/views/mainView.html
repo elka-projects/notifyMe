@@ -1,0 +1,15 @@
+<div ng-controller="DataController">
+  <md-content class="md-whiteframe-2dp margin" flex>
+    <p>All notifications<br></p>
+  </md-content>
+  <md-content class="md-whiteframe-2dp margin" flex>
+    <ul>
+      <div class="notification" ng-repeat="notification in notifications">
+        <div><h2>{{notification.channel}}</h2></div>
+        <div class="title">{{notification.topic}}</div>
+        <div class="dateAuthor">{{notification.author}} {{notification.date.substring(0,10)}}</div>
+        <md-button class="details" href = '#!/details'>Details</md-button>
+      </div>
+    </ul>
+  </md-content>
+</div>
