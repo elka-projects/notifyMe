@@ -4,6 +4,7 @@ package com.notifyme.controller;
  * Created by gepard on 20.04.17.
  */
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -15,7 +16,10 @@ import com.notifyme.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.*;
+
+import javax.mail.SendFailedException;
 
 @RestController
 public class Controller {
@@ -30,10 +34,17 @@ public class Controller {
     private TemplateRepository templateRepository;
 
     @Autowired
+    private TemplateSentRepository templateSentRepository;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
+
+    @Autowired
+    private EmailService emailService;
+
 
     @RequestMapping("/greeting")
     public String greet() {
@@ -238,9 +249,36 @@ public class Controller {
     @RequestMapping(value = "/sendNotification", method = RequestMethod.POST)
     public String sendMail(@RequestBody String body) {
         JSONObject mailInfo = new JSONObject(body);
-        String templateId = (String)mailInfo.get("id");
+
+        String templateId = (String) mailInfo.get("id");
+        String sendDate = (String) mailInfo.get("date");
+
         Template template = templateRepository.findById(templateId);
 
+        Project project = projectRepository.findByTitle(template.getProject());
+        List<User> receivers = userRepository.findByProjects(template.getProject());
+
+        try {
+            for (User user: receivers) {
+                emailService.sendTemplatedMessage(
+                        user.getMail(),
+                        template);
+
+                if (user.getTemplatesHistory() == null)
+                    user.setTemplatesHistory(new ArrayList<String>());
+                user.getTemplatesHistory().add(templateId);
+                userRepository.save(user);
+            }
+
+        } catch (MailException e) {
+            return resultFalse;
+        }
+
+        TemplateSent templateSent = new TemplateSent();
+        templateSent.setTemplateId(templateId);
+        templateSent.setDate(sendDate);
+
+        templateSentRepository.save(templateSent);
 
         return resultTrue;
     }

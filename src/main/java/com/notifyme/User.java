@@ -33,6 +33,7 @@ public class User {
         this.setFirstName(firstName);
         this.setLastName(lastName);
         this.setProjects(new ArrayList<String>());
+        this.setTemplatesHistory(new ArrayList<String>());
     }
 
     public void addProject( String p ) {
