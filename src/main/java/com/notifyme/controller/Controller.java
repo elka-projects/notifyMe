@@ -13,6 +13,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.notifyme.*;
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -199,8 +200,11 @@ public class Controller {
         catch( Exception e ) {
             return e.getMessage();
         }
+        if( userRepository.findByLogin(user.getLogin()) != null ) {
+            return resultFalse;
+        }
         userRepository.save(user);
-        return "{ \"result\" : \"true\" }";
+        return resultTrue;
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
@@ -249,6 +253,12 @@ public class Controller {
         Project project = projectRepository.findByTitle(template.getProject());
         List<User> receivers = userRepository.findByProjects(template.getProject());
 
+        TemplateSent templateSent = new TemplateSent();
+        ObjectId id = new ObjectId();
+        templateSent.setId(id.toString());
+        templateSent.setTemplateId(templateId);
+        templateSent.setDate(sendDate);
+
         try {
             for (User user: receivers) {
                 emailService.sendTemplatedMessage(
@@ -257,17 +267,13 @@ public class Controller {
 
                 if (user.getTemplatesHistory() == null)
                     user.setTemplatesHistory(new ArrayList<String>());
-                user.getTemplatesHistory().add(templateId);
+                user.getTemplatesHistory().add(id.toString());
                 userRepository.save(user);
             }
 
         } catch (MailException e) {
             return resultFalse;
         }
-
-        TemplateSent templateSent = new TemplateSent();
-        templateSent.setTemplateId(templateId);
-        templateSent.setDate(sendDate);
 
         templateSentRepository.save(templateSent);
 
