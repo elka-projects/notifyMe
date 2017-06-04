@@ -23,5 +23,5 @@ script:
 after_success:
   - if [ "$BUILD_DOCKER" == "true" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-    docker push elkaprojects/notifyme;
+    docker push pik05/notifyme;
     fi
