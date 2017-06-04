@@ -6,7 +6,8 @@
   </div>
   <h1 onclick="window.location='#!/home'">notifyMe</h1>
   <ul>
-    <li><a href="#!/register" hide-xs>Register</a></li>
-    <li><a href="#!/login">Sign In</a></li>
+    <li><a href="#!/register" ng-show="!logged()" hide-xs>Register</a></li>
+    <li><a href="#!/login" ng-show="!logged()">Sign In</a></li>
+    <li><a href="#!/logout" ng-click="logout()" ng-show="logged()">Log out</a></li>
   </ul>
 </div>

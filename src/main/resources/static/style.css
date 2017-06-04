@@ -6,11 +6,21 @@
     md-card-title {
       background-color: blue;
     }
-  }
+  };
+
 }
 .logo {
   color: red;
   font-family: 'Vibur', cursive;
+}
+
+.dateAuthor {
+  float: left;
+}
+
+.notification {
+  border-bottom: 3px solid gray;
+  margin-right: 30px;
 }
 
 .margin{
