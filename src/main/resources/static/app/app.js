@@ -306,7 +306,7 @@ notifyMe.controller('FollowersController', function($scope, $http, sharedPropert
 
     $scope.addUser = function () {
       var data = {
-        "userId": $scope.vm.formData.name,
+        "login": $scope.vm.formData.name,
         "title": $scope.projectName
       };
       $http({
@@ -352,17 +352,6 @@ notifyMe.controller('DataController', function($scope, sharedProperties, $http) 
       return true;
     }
   }
-
-  $scope.notifications;
-
-
-  $scope.channels = [
-      'Projekt PIK', 'Cytaty Zbigniewa Stonogi', 'Moje zycie'
-    ];
-
-  $scope.users = [
-    'Wiktor Grzesiuk', 'Michal Glinka'
-  ];
 
   $scope.addUser = function() {
     $scope.users.push($scope.vm.formData.name);
