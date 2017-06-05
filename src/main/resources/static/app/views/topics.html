@@ -1,4 +1,4 @@
-<div  layout="column" ng-controller="DataController">
+<div  layout="column" ng-controller="ProjectsController">
   <md-content class="md-whiteframe-2dp margin" flex>
     <p>Add topic<br></p>
     <form name="Form">
@@ -9,14 +9,14 @@
       </div>
     </md-input-container>
   </form>
-  <md-button ng-disabled="!Form.$valid" ng-click="addChannel()" class="md-raised md-primary">&nbsp Add &nbsp</md-button>
+  <md-button ng-disabled="!Form.$valid" ng-click="add()" class="md-raised md-primary">&nbsp Add &nbsp</md-button>
   </md-content>
   <md-content class="md-whiteframe-2dp margin" flex>
     <ul>
-      <div class="notification" ng-repeat="channel in channels" layout="row">
-        <div><h2>{{channel}}</h2></div>
-        <md-button>Edit</md-button>
-        <md-button>Delete</md-button>
+      <div class="notification" ng-repeat="project in projects" layout="row">
+        <div><h2>{{project.title}}</h2></div>
+        <md-button ng-click="edit($index)" >Edit</md-button>
+        <md-button ng-click="delete($index)" >Delete</md-button>
       </div>
     </ul>
   </md-content>

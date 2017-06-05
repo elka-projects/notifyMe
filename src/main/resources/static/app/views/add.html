@@ -1,5 +1,31 @@
-<div  layout="row" layout-xs="column" layout-sm="column" layout-md="column">
+<div  layout="row" layout-xs="column" layout-sm="column" layout-md="column" ng-controller="MyController" an-app="notifyMe">
   <md-content class="md-whiteframe-2dp margin" flex>
     <p>Add Notification<br></p>
+  </md-content>
+  <md-content class="md-whiteframe-2dp margin" flex>
+  <form name="Form">
+    <md-input-container class="md-block">
+      <label>Project</label>
+      <input type="text" name="project" ng-model="add.formData.project" placeholder="project" required=""/>
+      <div ng-messages="Form.project.$error" role="alert" multiple="">
+        <div ng-message="required" class="my-message">Please enter project.</div>
+      </div>
+    </md-input-container>
+    <md-input-container class="md-block">
+      <label>Title</label>
+      <input type="text" name="title" ng-model="add.formData.title" placeholder="title" required=""/>
+      <div ng-messages="Form.title.$error" role="alert" multiple="">
+        <div ng-message="required" class="my-message">Please enter title.</div>
+      </div>
+    </md-input-container>
+    <md-input-container class="md-block">
+      <label>Content</label>
+      <textarea type="text" name="content" ng-model="add.formData.content" placeholder="content" required=""></textarea>
+      <div ng-messages="Form.content.$error" role="alert" multiple="">
+        <div ng-message="required" class="my-message">Please enter content.</div>
+      </div>
+    </md-input-container>
+    <md-button ng-disabled="!Form.$valid" ng-click="sendNotification()" class="md-raised md-primary">&nbsp Send &nbsp</md-button>
+  </form>
   </md-content>
 </div>
