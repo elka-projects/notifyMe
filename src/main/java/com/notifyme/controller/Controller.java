@@ -86,6 +86,7 @@ public class Controller {
         String title = (String)unsubscribe.get("title");
         User user = userRepository.findById(userId);
         user.deleteProject(title);
+        userRepository.save(user);
         return resultTrue;
     }
 
