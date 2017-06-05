@@ -71,9 +71,9 @@ public class Controller {
     @RequestMapping(value = "/subscribe", method = RequestMethod.POST)
     public String addUserToProject(@RequestBody String body) {
         JSONObject subscription = new JSONObject(body);
-        String userId = (String)subscription.get("userId");
+        String login = (String)subscription.get("login");
         String title = (String)subscription.get("title");
-        User user = userRepository.findById(userId);
+        User user = userRepository.findByLogin(login);
         user.addProject(title);
         userRepository.save(user);
         return resultTrue;
