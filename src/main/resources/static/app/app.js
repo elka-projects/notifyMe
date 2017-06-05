@@ -316,7 +316,7 @@ notifyMe.controller('FollowersController', function($scope, $http, sharedPropert
           headers: {"jwt": sharedProperties.getJwt()}
       }).then(function (response) {
         console.log('res', response);
-        users.push(data);
+        $scope.users.push(data);
       }, function (error) {
         console.log('err', error);
       });
