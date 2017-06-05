@@ -35,7 +35,9 @@ public class HSSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/authenticate").anonymous()
                 .antMatchers("/register").anonymous()
-                .antMatchers("/**").fullyAuthenticated();
+                .antMatchers("/#!").anonymous();
+                //.antMatchers("/**").fullyAuthenticated();
+
         //                .antMatchers(HttpMethod.GET, "/secure/**").hasAuthority("read:greeting");
 
     }

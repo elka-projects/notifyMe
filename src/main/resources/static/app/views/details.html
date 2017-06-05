@@ -1,10 +1,10 @@
-<div ng-controller="DataController" layout="row" layout-xs="column" layout-sm="column" layout-md="column">
+<div ng-controller="MyController" layout="row" layout-xs="column" layout-sm="column" layout-md="column">
   <md-content class="md-whiteframe-2dp margin" flex>
     <div class="description">
-      <div><h2>{{detail.channel}}</h2></div>
-      <div class="title">{{detail.topic}}</div>
-      <div class="dateAuthor">{{detail.author}} {{detail.date.substring(0,10)}}</div></br></br>
-      <div>{{detail.message}}</div>
+      <div><h2>{{detail.project}}</h2></div>
+      <div class="title">{{detail.title}}</div>
+      <div class="dateAuthor">{{detail.author}} {{detail.date}}</div></br></br>
+      <div>{{detail.content}}</div>
     </div>
   </md-content>
 </div>

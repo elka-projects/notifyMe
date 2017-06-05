@@ -1,6 +1,6 @@
-<div  layout="column" ng-controller="DataController">
+<div  layout="column" ng-controller="FollowersController">
   <md-content class="md-whiteframe-2dp margin" flex>
-    <p>Add follower<br></p>
+    <p>Add follower to {{projectName}}<br></p>
     <form name="Form">
     <md-input-container class="md-block">
       <input type="text" name="follower" placeholder="name" ng-model="vm.formData.name" required=""/>
@@ -14,7 +14,7 @@
   <md-content class="md-whiteframe-2dp margin" flex>
     <ul>
       <div class="notification" ng-repeat="user in users">
-        <div><h2>{{user}}</h2></div>
+        <div><h2>{{user.login}}</h2>  <md-button ng-click="removeUser($index)">&nbsp Remove &nbsp</md-button></div>
       </div>
     </ul>
   </md-content>
