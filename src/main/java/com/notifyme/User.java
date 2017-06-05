@@ -37,10 +37,16 @@ public class User {
     }
 
     public void addProject( String p ) {
+        if (projects == null)
+            projects = new ArrayList<String>();
         getProjects().add(p);
     }
 
-    public void deleteProject( String p ) { getProjects().remove(p); }
+    public void deleteProject( String p ) {
+        if (projects == null)
+            projects = new ArrayList<String>();
+        getProjects().remove(p);
+    }
 
     @Override
     public String toString() {
@@ -98,6 +104,8 @@ public class User {
     }
 
     public List<String> getTemplatesHistory() {
+        if (templatesHistory == null)
+            templatesHistory = new ArrayList<String>();
         return templatesHistory;
     }
 
