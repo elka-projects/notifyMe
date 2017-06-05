@@ -5,6 +5,7 @@ package com.notifyme.controller;
  */
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -85,6 +86,7 @@ public class Controller {
         String title = (String)unsubscribe.get("title");
         User user = userRepository.findById(userId);
         user.deleteProject(title);
+        userRepository.save(user);
         return resultTrue;
     }
 
@@ -142,10 +144,14 @@ public class Controller {
             project = mapper.readValue(body, Project.class);
         }
         catch( Exception e ) {
-            return resultFalse;
+            return "{ \"id\" : \"0\" }";
         }
+
+        ObjectId id = new ObjectId();
+        project.setProjectId(id.toString());
+
         projectRepository.save(project);
-        return resultTrue;
+        return String.format("{ \"id\" : \"%s\" }", id.toString());
     }
 
     @RequestMapping(value = "/delProject", method = RequestMethod.POST)
@@ -170,10 +176,14 @@ public class Controller {
             template = mapper.readValue(body, Template.class);
         }
         catch( Exception e ) {
-            return resultFalse;
+            return "{ \"id\" : \"0\" }";
         }
+        ObjectId id = new ObjectId();
+        template.setId(id.toString());
+        template.setDate((new Date()).toString());
+
         templateRepository.save(template);
-        return resultTrue;
+        return String.format("{ \"id\" : \"%s\" }", id.toString());
     }
 
     @RequestMapping(value = "/deleteTemplate", method = RequestMethod.POST)
@@ -246,7 +256,7 @@ public class Controller {
         JSONObject mailInfo = new JSONObject(body);
 
         String templateId = (String) mailInfo.get("id");
-        String sendDate = (String) mailInfo.get("date");
+        String sendDate = (new Date()).toString();
 
         Template template = templateRepository.findById(templateId);
 
